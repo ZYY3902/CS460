@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+{% if name %}
+  <h1>{{ name }}</h1>
+{% endif %}
+
+<table border=1 width=98% style="margin-left:12px; background-color: aliceblue;">
+    
+    <colgroup>
+        <col span="1" style="width: 50%;">
+        <col span="1" style="width: 50%;">  
+    </colgroup>
+    <tr>
+        <th></th> <!-- empty -->
+        <th></th>
+    <!-- for loop to display a listing of parts -->
+    </tr>
+    {% for photo in photos %}
+    <tr>
+        <td style="text-align: center"><img src={{photo}} style="width: 60%;" /></td>
+        <td style="text-align: center">{{caption}}</a></td>
+    </tr>
+    {% endfor %}
+
+</table>
+
+{% endblock %}

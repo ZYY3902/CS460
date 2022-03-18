@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Search</h2>
+
+<form>
+    <label for="fname">First Name:</label>
+    <input type = "text", name = "search_fname">
+    <label for="lname">Last Name:</label>
+    <input type = "text", name = "search_lname">
+    <input type="submit", value="seach">
+</form>
+
+<h2>Search Result</h2>
+{% if searchs %}
+    <ul> <!-- for loop to display the search result -->
+        {% for s in searchs %}
+        <li>
+            {{s[0]}}
+        </li>
+        {% endfor %}
+    </ul>
+{% else %} <!-- if nothing found, display "no results" -->
+    No results matched your search.
+{% endif %}
+
+{% endblock %}
