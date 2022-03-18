@@ -26,12 +26,15 @@
   </ul>
 {% endif %}
 
-{% if photos %}
+{% if photos %} <!-- make it to a table and display which album -->
 <h2>Here are your photos</h2>
     <ul>
     {% for photo in photos %}
-        <li>{{photo[2]}}<br>
-        <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;"></li>
+        <li>
+          {{photo[2]}}<br>
+          <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+          <a href='/delete_photo'>Delete Photo</a>
+      </li>
     {% endfor %}
     </ul>
 {% endif %}

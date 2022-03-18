@@ -232,10 +232,10 @@ def create_album():
 def delete_album():
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		aname = getAlbumNameFromAlbums(uid)
+		aid = getAlbumIdFromUsers(uid)
 		cursor = conn.cursor()
-		cursor.execute("DELETE FROM Photos WHERE photo_id = '{0}'".format(uid))
-		cursor.execute("DELETE FROM Albums WHERE aname = '{0}'".format(aname))
+		cursor.execute("DELETE FROM Photos WHERE albums_id = '{0}'".format(aid))
+		cursor.execute("DELETE FROM Albums WHERE albums_id = '{0}'".format(aid))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, 
 								message='Album Deleted!')
@@ -261,24 +261,6 @@ def upload_file():
 	else:
 		return render_template('upload.html')
 
-# @app.route('/upload', methods=['GET', 'POST'])
-# @flask_login.login_required
-# def upload_file():
-# 	if request.method == 'POST':
-# 		uid = getUserIdFromEmail(flask_login.current_user.id)
-# 		imgfile = request.files['photo']
-# 		caption = request.form.get('caption')
-# 		photo_data =imgfile.read()
-# 		cursor = conn.cursor()
-# 		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) \
-# 						VALUES (%s, %s, %s )''', (photo_data, uid, caption))
-# 		conn.commit()
-# 		return render_template('hello.html', name=flask_login.current_user.id, 
-# 								message='Photo uploaded!', photos=getUsersPhotos(uid), base64=base64)
-# 	#The method is GET so we return a  HTML form to upload the a photo.
-# 	else:
-# 		return render_template('upload.html')
-
 @app.route('/show_photo', methods=['GET', 'POST'])
 @flask_login.login_required
 def show_photo():
@@ -287,12 +269,33 @@ def show_photo():
 	cursor = conn.cursor()
 	cursor.execute("SELECT data, caption FROM Photos WHERE user_id = '{0}'".format(aid))
 	return render_template('show_photo.html', name = getAlbumNameFromAlbums(uid), photos=getUsersPhotos(uid))
-	
+
+@app.route("/delete_photo", methods=['GET', 'POST'])
+@flask_login.login_required
+def delete_photo():
+	if request.method == 'POST':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		pid = getPhotoIdFromPhotos(uid)
+		cursor = conn.cursor()
+		cursor.execute("DELETE FROM Photos WHERE photo_id = '{0}'".format(pid))
+		conn.commit()
+		return render_template('hello.html', name=flask_login.current_user.id, 
+								message='Photo Deleted!')
+	else:
+		return render_template('delete_photo.html')	
+
 def getAlbumIdFromUsers(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT albums_id FROM Albums WHERE user_id = '{0}'".format(uid))
 	return cursor.fetchone()[0]
+	
+def getPhotoIdFromPhotos(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT photo_id FROM Photos WHERE user_id = '{0}'".format(uid))
+	return cursor.fetchone()[0]
 
+
+# function not in use #
 def getAlbumNameFromAlbums(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT aname FROM Albums WHERE user_id = '{0}'".format(uid))
