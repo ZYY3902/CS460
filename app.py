@@ -80,10 +80,6 @@ def new_page_function():
 	return new_page_html
 '''
 
-### 					  ###
-# User Login & Registration #
-###						  ###
-
 #default page
 @app.route("/", methods=['GET'])
 def hello():
@@ -131,15 +127,6 @@ def unauthorized_handler():
 def register():
 	return render_template('register.html', supress='True')
 
-@app.route('/userprofile', methods=['GET'])
-@flask_login.login_required
-def protected():
-	email = flask_login.current_user.id
-	uid = getUserIdFromEmail(email)
-	# friend_list = getFriendSuggestion()
-	return render_template('hello.html', name = email, albums = getUsersAlbums(uid),
-							photos = getUsersPhotos(uid), )
-
 @app.route("/register", methods=['POST'])
 def register_user():
 	try:
@@ -168,6 +155,14 @@ def register_user():
 		print('Account exists!')
 		return flask.redirect(flask.url_for('register'))
 
+@app.route('/userprofile', methods=['GET'])
+@flask_login.login_required
+def protected():
+	email = flask_login.current_user.id
+	uid = getUserIdFromEmail(email)
+	# friend_list = getFriendSuggestion()
+	return render_template('hello.html', name = email, albums = getUsersAlbums(uid),
+							photos = getUsersPhotos(uid), base64 = base64)
 
 # Functions to get user data
 def getUsersPhotos(uid):
@@ -239,6 +234,7 @@ def delete_album():
 		uid = getUserIdFromEmail(flask_login.current_user.id)
 		aname = getAlbumNameFromAlbums(uid)
 		cursor = conn.cursor()
+		cursor.execute("DELETE FROM Photos WHERE photo_id = '{0}'".format(uid))
 		cursor.execute("DELETE FROM Albums WHERE aname = '{0}'".format(aname))
 		conn.commit()
 		return render_template('hello.html', name=flask_login.current_user.id, 
@@ -264,6 +260,24 @@ def upload_file():
 	#The method is GET so we return a  HTML form to upload the a photo.
 	else:
 		return render_template('upload.html')
+
+# @app.route('/upload', methods=['GET', 'POST'])
+# @flask_login.login_required
+# def upload_file():
+# 	if request.method == 'POST':
+# 		uid = getUserIdFromEmail(flask_login.current_user.id)
+# 		imgfile = request.files['photo']
+# 		caption = request.form.get('caption')
+# 		photo_data =imgfile.read()
+# 		cursor = conn.cursor()
+# 		cursor.execute('''INSERT INTO Pictures (imgdata, user_id, caption) \
+# 						VALUES (%s, %s, %s )''', (photo_data, uid, caption))
+# 		conn.commit()
+# 		return render_template('hello.html', name=flask_login.current_user.id, 
+# 								message='Photo uploaded!', photos=getUsersPhotos(uid), base64=base64)
+# 	#The method is GET so we return a  HTML form to upload the a photo.
+# 	else:
+# 		return render_template('upload.html')
 
 @app.route('/show_photo', methods=['GET', 'POST'])
 @flask_login.login_required

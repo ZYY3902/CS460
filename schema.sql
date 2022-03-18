@@ -83,4 +83,3 @@ SELECT * FROM Users;
 SELECT * FROM Albums;
 SELECT * FROM Photos;
 
-ALTER TABLE Photos DROP FOREIGN KEY (albums_id) REFERENCES Albums (albums_id);
