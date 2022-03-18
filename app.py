@@ -9,7 +9,6 @@
 # see links for further understanding
 ###################################################
 
-import email
 from re import search
 from tkinter import S
 from unicodedata import name
