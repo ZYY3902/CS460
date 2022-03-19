@@ -32,11 +32,33 @@
         <li>
           {{photo[2]}}<br>
           <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
-          <a href='/delete_photo'>Delete Photo</a>
-      </li>
+          <a href='/delete_photo'>Delete Photo</a> | 
+          <a href='/add_tag'>Add Tag</a>
+        </li>
     {% endfor %}
     </ul>
 {% endif %}
+
+{%if tags %}
+  <h2>Here are your tags</h2>
+  <ul>
+    {% for tag in tags %}
+      <li>
+        <a href="{{tag}}">{{tag}}</a>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<div id="logbox">
+  <form method="post" enctype="multipart/form-data" action="/add_friend">
+    <table>
+        <label for="friend_email">Email:</label>
+        <input type="text" name="friend_email" required='true' /><br />
+        <input type="submit" value="Add Friend!" />
+    </table>
+</form>
+</div>
 
 {%if friends %}
   <h2>Here are your friends</h2>
@@ -49,7 +71,6 @@
   </ul>
 {% endif %}
 
-
 <!-- NO MESSAGE -->
 {% if message is none %}  
   <p>You should <a href='/login'>login!</a></p>
@@ -57,10 +78,5 @@
   <p> Go to <a href='/userprofile'>profile?</a></p>
 {% endif %}
 
-<ul>
-  <li><a href='/upload'>Upload a photo</a> </li>
-  <li><a href='/logout'>Logout</a></li>
-  <li><a href='/'>Home</a></li>
-</ul>
 
 {% endblock %}

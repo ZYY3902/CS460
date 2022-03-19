@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title></title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Are you sure you want to add this tag for your photo?</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/add_tag">
+                <table>
+                    <label for="tag_name">Tag Name:</label>
+                    <input type="text" name="tag_name" required='true'/><br />
+                    <input type="submit" value=" Add! " />
+                </table>
+            </form>
+    </body>
+
+{% endblock %}

@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title>Create a tag!</title>
+</head>
+
+{% if message %}
+  <h2>{{message}}!</h2>
+{% endif %}
+
+    <body>
+        <div class="title">
+            <h1>Create a tag!</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/create_tag">
+                <table>
+                    <label for="word">Tag Name:</label>
+                    <input type="text" name="word" required='true' /><br />
+                    <input type="submit" value="Create!" />
+                </table>
+            </form>
+    </body>
+
+{% endblock %}

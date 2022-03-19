@@ -1,4 +1,3 @@
-DROP DATABASE IF EXISTS photoshare;
 CREATE DATABASE IF NOT EXISTS photoshare;
 USE photoshare;
 
@@ -83,7 +82,8 @@ SELECT * FROM Friends;
 SELECT * FROM Users;
 SELECT * FROM Albums;
 SELECT * FROM Photos;
+SELECT * FROM Tags;
 
-DROP TABLE Tagged;
-DROP TABLE Tags;
+-- DROP TABLE Tagged;
+-- DROP TABLE Tags;
 
