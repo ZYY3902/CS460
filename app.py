@@ -9,6 +9,7 @@
 # see links for further understanding
 ###################################################
 
+import email
 from re import search
 from tkinter import S
 from unicodedata import name
@@ -169,6 +170,11 @@ def getUsersPhotos(uid):
 	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE user_id = '{0}'".format(uid))
 	return cursor.fetchall() #NOTE list of tuples, [(imgdata, pid), ...]
 
+def getUsersName(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT fname, lname FROM Users WHERE user_id = '{0}'".format(uid))
+	return cursor.fetchall()
+
 def getUserIdFromEmail(email):
 	cursor = conn.cursor()
 	cursor.execute("SELECT user_id FROM Users WHERE email = '{0}'".format(email))
@@ -187,18 +193,22 @@ def isEmailUnique(email):
 @flask_login.login_required
 def search_friends():
 	if request.method == 'POST':
-		fname = request.form.get('fname')
-		lname = request.form.get('lname')
-		cursor = conn.cursor()
-		cursor.execute("SELECT fname, lname FROM Users \
-						WHERE fname LIKE %s AND lname LIKE %s",(fname, lname))
-		search = cursor.fetchall()
+		email = request.form.get("email")
+		friend = getUserIdFromEmail(email)
+		search = getUsersName(friend)
 	return render_template("search_friend.html", searchs = search)
 
-# def getUserNameFromEmail(email):
+# @app.route("/add_friend", methods=['POST'])
+# def add_friend():
+# 	uid1 = getUserIdFromEmail(flask_login.current_user.id)
+# 	uid2 = request.form.get('uid2')
 # 	cursor = conn.cursor()
-# 	cursor.execute("SELECT fname,lname FROM Users WHERE email = '{0}'".format(email))
-# 	return cursor.fetchone()[0]
+# 	cursor.execute("INSERT INTO Friends (user_id1, user_id2) \
+# 					VALUES (%s, %s)", (uid1, uid2))
+# 	conn.commit()
+# 	return flask.redirect(flask.url_for('protected'))
+
+
 #end login code
 
 

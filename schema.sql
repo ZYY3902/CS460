@@ -35,7 +35,7 @@ CREATE TABLE Photos(
 );
 
 CREATE TABLE Tags(
- tag_id INTEGER,
+ tag_id INTEGER AUTO_INCREMENT,
  word VARCHAR(100),
  PRIMARY KEY (tag_id)
 );
@@ -83,4 +83,7 @@ SELECT * FROM Friends;
 SELECT * FROM Users;
 SELECT * FROM Albums;
 SELECT * FROM Photos;
+
+DROP TABLE Tagged;
+DROP TABLE Tags;
 

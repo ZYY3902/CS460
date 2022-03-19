@@ -1,21 +1,17 @@
 <h2>Search</h2>
 
 <form>
-    <label for="fname">First Name:</label>
-    <input type = "text", name = "search_fname">
-    <label for="lname">Last Name:</label>
-    <input type = "text", name = "search_lname">
-    <input type="submit", value="seach">
+    <label for="email">email:</label>
+    <input type = "text", name = "email">
+    <input type="submit", value="search">
 </form>
 
 <h2>Search Result</h2>
 {% if searchs %}
     <ul> <!-- for loop to display the search result -->
-        {% for s in searchs %}
         <li>
-            {{s[0]}}
+            {{searchs}}
         </li>
-        {% endfor %}
     </ul>
 {% else %} <!-- if nothing found, display "no results" -->
     No results matched your search.
