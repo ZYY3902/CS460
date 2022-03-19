@@ -1,0 +1,8 @@
+INSERT INTO Users (user_id, email, password, fname, lname, gender, dob, hometown) VALUES
+'1', 'Luna', 'Zhu', 'test@bu.edu', 'Female', '2000-01-01', 'Covina, CA', '0test0'
+'2', 'Jane', 'Doe', 'test1@bu.edu', 'Female', '2000-01-11', 'Boston, MA', '1test1'
+'3', 'John', 'Doe', 'test2@bu.edu', 'Male', '2002-03-08', 'Boston, MA', '2test2'
+
+
+
+

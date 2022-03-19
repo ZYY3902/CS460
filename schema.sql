@@ -84,3 +84,6 @@ SELECT * FROM Users;
 SELECT * FROM Albums;
 SELECT * FROM Photos;
 
+DROP TABLE Tagged;
+DROP TABLE Tags;
+
