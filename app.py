@@ -283,6 +283,40 @@ def delete_photo():
 	else:
 		return render_template('delete_photo.html')	
 
+
+# The following part is associated with TAG
+
+@app.route("/create_tag", methods=['GET', 'POST'])
+@flask_login.login_required
+def create_tag():
+	if request.method == 'POST':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		word = request.form.get('word')
+		# this should no longer be needed since we change the schema of tag_id to auto-increment
+			# tid = request.form.get('tag_id')
+		# check if the tag has been created before!
+		if checkTagExist(word):
+			return render_template('hello.html', name=flask_login.current_user.id, message='Tag Already Exists!')
+		else:
+			cursor = conn.cursor()
+			cursor.execute('''INSERT INTO Tags (tid, word) \
+				VALUES (%s, %s)''',(tid, word))
+			conn.commit()
+			return render_template('hello.html', name=flask_login.current_user.id, 
+									message='Tag Created!')
+	else:
+		return render_template('create_tag.html')
+
+# helper func check if a tag already exists
+def checkTagExist(word):
+	cursor = conn.cursor()
+	if cursor.execute("SELECT word FROM Tags WHERE word = '{0}'".format(word)):
+		return True
+	else:
+		return False
+
+##############################
+
 def getAlbumIdFromUsers(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT albums_id FROM Albums WHERE user_id = '{0}'".format(uid))

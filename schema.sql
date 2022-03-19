@@ -1,4 +1,4 @@
-DROP DATABASE IF EXISTS photoshare;
+-- DROP DATABASE IF EXISTS photoshare;
 CREATE DATABASE IF NOT EXISTS photoshare;
 USE photoshare;
 
@@ -35,7 +35,7 @@ CREATE TABLE Photos(
 );
 
 CREATE TABLE Tags(
- tag_id INTEGER,
+ tag_id INTEGER AUTO_INCREMENT,
  word VARCHAR(100),
  PRIMARY KEY (tag_id)
 );
