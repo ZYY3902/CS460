@@ -1,3 +1,7 @@
+<<<<<<< HEAD
+=======
+-- DROP DATABASE IF EXISTS photoshare;
+>>>>>>> 79b0a3e67243b061fd04c9d040b075548469ee27
 CREATE DATABASE IF NOT EXISTS photoshare;
 USE photoshare;
 
