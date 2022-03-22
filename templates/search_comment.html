@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h2>Search Comment</h2>
+
+<form method="post" action="/search_comment">
+    <label for="text">Comment:</label>
+    <input type = "text", name = "text">
+    <input type="submit", value="search">
+</form>
+
+<h2>Search Result</h2>
+{% if names %}
+    <ul> <!-- for loop to display the search result -->
+        {% for n in names %}
+        <li>
+            {{n}}
+        </li>
+        {% endfor %}
+    </ul>
+{% else %} <!-- if nothing found, display "no results" -->
+    No results matched your search.
+{% endif %}
+
+{% endblock %}

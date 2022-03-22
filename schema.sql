@@ -1,7 +1,3 @@
-<<<<<<< HEAD
-=======
--- DROP DATABASE IF EXISTS photoshare;
->>>>>>> 79b0a3e67243b061fd04c9d040b075548469ee27
 CREATE DATABASE IF NOT EXISTS photoshare;
 USE photoshare;
 
@@ -82,12 +78,33 @@ CREATE TABLE Friends(
 INSERT INTO Users (user_id, email, password, fname, lname, gender, dob, hometown) 
 VALUES (0,'test@bu.edu','0test0','Luna','Zhu','Female', '2000-01-01','Covina, CA');
 
+-- Testing Code Below
 SELECT * FROM Friends;
 SELECT * FROM Users;
 SELECT * FROM Albums;
 SELECT * FROM Photos;
 SELECT * FROM Tags;
+SELECT * FROM Tagged;
+SELECT * FROM Comments;
+SELECT * FROM Likes;
 
--- DROP TABLE Tagged;
--- DROP TABLE Tags;
+SELECT user_id2 
+FROM Friends
+WHERE user_id1 = 1;
 
+SELECT t1.fname, t1.lname, SUM(t1.sum) AS Total
+FROM (
+SELECT Users.fname, Users.lname, COUNT(photo_id) AS sum FROM Photos, Users WHERE Photos.user_id = Users.user_id GROUP BY Users.user_id
+UNION ALL 
+SELECT Users.fname, Users.lname, COUNT(comment_id) AS sum FROM Comments, Users WHERE Comments.user_id = Users.user_id GROUP BY Users.user_id
+)t1
+GROUP BY t1.fname, t1.lname;
+
+
+SELECT Photos.photo_id, count(Likes.user_id)
+FROM Photos, Likes
+WHERE Likes.user_id = Photos.user_id 
+GROUP BY Photos.photo_id;
+
+-- count(Likes.user_id), Photos.data, Photos.photo_id , Photos.caption, Photos.user_id
+-- Comments.text, Photos.data, Photos.photo_id , Photos.caption, Photos.user_id

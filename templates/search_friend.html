@@ -1,6 +1,9 @@
-<h2>Search</h2>
+{% extends "base.html" %}
+{% block content %}
 
-<form action="/search_friend", method="get">
+<h2>Search friends</h2>
+
+<form method="post" action="/search_friend">
     <label for="email">email:</label>
     <input type = "text", name = "email">
     <input type="submit", value="search">
@@ -9,10 +12,21 @@
 <h2>Search Result</h2>
 {% if searchs %}
     <ul> <!-- for loop to display the search result -->
+        {% for s in searchs %}
         <li>
-            {{searchs}}
+            {{s}}
+            <form method="post" enctype="multipart/form-data" action="/add_friend">
+                <table>
+                    <input type="text" name="friend_email" placeholder= "Enter Friend's email to Add" required='true' /><br />
+                    <input type="submit" value="Add Friend!" />
+                </table>
+            </form>
         </li>
+        {% endfor %}
     </ul>
+    
 {% else %} <!-- if nothing found, display "no results" -->
     No results matched your search.
 {% endif %}
+
+{% endblock %}

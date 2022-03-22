@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block content %}
+
+<!doctype html>
+<title>Photoshare</title>
+
+{% if message %}
+  <h2>{{message}}!</h2>
+{% endif %}
+
+{% if tests %}
+<h2>{{tests}}</h2>
+{% endif %}
+
+
+<ul>
+    {% for photo in photos %} 
+        <li>
+            {{photo[1]}} | {{photo[2]}} |
+            <a href='/add_comment'>Add Comments</a> |
+            <a href='/add_like'>Give a Like</a><br>
+          <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+        </li>
+    {% endfor %}
+    {% for like in likes %} 
+        <li>
+           Likes for {{like[0]}}: {{like[1]}}
+        </li>
+    {% endfor %}
+    {% for c in comments %} 
+        <li>
+        Comments for {{c[0]}}: {{c[1]}}
+        </li>
+{% endfor %}
+</ul>
+        <!-- 
+        <td>
+            {% for photo in photos %}
+            <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 40%;">
+            {% endfor %}
+        </td>
+        <td>
+            <form method="post" enctype="multipart/form-data" action="/add_comment">
+                <table>
+                    <input type="text" name="text" placeholder= "Enter Comments" required='true' /><br />
+                    <label for="pid">Photo Id:</label>
+                    <input type="text" name="pid" required='true' /><br />
+                    <label for="comment_date">Comment Date:</label>
+                    <input type="text" name="comment_date" required='true' /><br />
+                    <input type="submit" value="Add Comment!" />
+                </table>
+            </form>
+        </td>
+        <td>
+        </td>  
+    </tr> -->
+        
+    
+</table>
+
+
+
+{% endblock %}

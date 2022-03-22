@@ -5,4 +5,50 @@ INSERT INTO Users (user_id, email, password, fname, lname, gender, dob, hometown
 
 
 
-
+public.html
+<!-- 
+    <h3>Leave A Comment</h3>
+        <form method="post" enctype="multipart/form-data" action="/add_comment">
+        <table>
+            <input type="text" name="text" placeholder= "Enter Comments" required='true' /><br />
+            <label for="pid">Photo Id:</label>
+            <input type="text" name="pid" required='true' /><br />
+            <label for="comment_date">Comment Date:</label>
+            <input type="text" name="comment_date" required='true' /><br />
+            <input type="submit" value="Add Comment!" />
+        </table>
+        </form>
+    <h3>Give A Like</h3>
+        <form method="post" enctype="multipart/form-data" action="/add_like">
+        <table>
+            <label for="pid">Please Enter the Photo Id:</label>
+            <input type="text" name="pid" required='true' /><br />
+            <input type="submit" value="Like!" />
+        </table>
+        </form>
+     <ul>
+    {% for photo in photos %}
+        <li>
+          Photo id: {{photo[1]}} <br>
+          Photo Caption: {{photo[2]}}<br>
+          <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">\
+          {% if comments %}
+            <h2>Comments </h2>h2>
+            {%  for comment in comments %}
+                <ul>
+                    <li>{{ comment }}</li>li>
+                </ul>
+            {% endfor %}
+          {% endif %} -->
+          <!-- {% if likes %}
+            <h2>Like: </h2>h2>
+            {%  for like in likes %}
+                <ul>
+                    <li>{{ like }}</li>li>
+                </ul>
+            {% endfor %}
+          {% endif %}
+        </li>
+    {% endfor %}
+    </ul>
+{% endif %} --> -->

@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block content %}
+
+<h3>Leave A Comment</h3>
+    <form method="post" enctype="multipart/form-data" action="/add_like">
+    <table>
+        <input type="text" name="text" placeholder= "Enter Comments" required='true' /><br />
+            <label for="pid">Photo Id:</label>
+            <input type="text" name="pid" required='true' /><br />
+            <label for="comment_date">Comment Date:</label>
+            <input type="text" name="comment_date" required='true' /><br />
+            <input type="submit" value="Add Comment!" />
+    </table>
+    </form>
+
+{% endblock %}

@@ -18,7 +18,7 @@
   <ul>
     {% for album in albums %}
       <li>
-        <a href="{{album}}">{{album}}</a>
+        <a href='{{album}}'>{{album[0]}}</a>
         <a href='/delete_album'>Delete Album</a>
       </li>
     {% endfor %}
@@ -44,28 +44,47 @@
   <ul>
     {% for tag in tags %}
       <li>
-        <a href="{{tag}}">{{tag}}</a>
+        <a href='/show_photo'>{{tag[0]}}</a>
       </li>
     {% endfor %}
   </ul>
 {% endif %}
-
-<div id="logbox">
-  <form method="post" enctype="multipart/form-data" action="/add_friend">
-    <table>
-        <label for="friend_email">Email:</label>
-        <input type="text" name="friend_email" required='true' /><br />
-        <input type="submit" value="Add Friend!" />
-    </table>
-</form>
-</div>
 
 {%if friends %}
   <h2>Here are your friends</h2>
   <ul>
     {% for friend in friends %}
       <li>
-        <a href="{{friend}}">{{friend}}</a>
+        {{friend[0]}}, {{friend[1]}}
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+
+{%if friends_recommendation %}
+<h2>Here are your friends recommendation</h2>
+  <ul>
+    {% for r in friends_recommendation %}
+      <li>
+        {{r[0]}}, {{r[1]}}, {{r[2]}}
+        <form method="post" enctype="multipart/form-data" action="/add_friend">
+          <table>
+              <input type="text" name="friend_email" placeholder= "Enter Friend's email to Add" required='true' /><br />
+              <input type="submit" value="Add Friend!" />
+          </table>
+      </form>
+      </li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+{%if userActivitys %}
+  <h2>Top 10 Users</h2>
+  <ul>
+    {% for user in userActivitys %}
+      <li>
+        {{user[0]}}, {{user[1]}}
       </li>
     {% endfor %}
   </ul>
