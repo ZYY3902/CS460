@@ -61,7 +61,7 @@ CREATE TABLE Likes(
 CREATE TABLE Tagged(
  photo_id INTEGER,
  tag_id INTEGER,
- PRIMARY KEY (photo_id, tag_id),
+ --PRIMARY KEY (photo_id, tag_id),
  FOREIGN KEY(photo_id) REFERENCES Photos (photo_id),
  FOREIGN KEY(tag_id) REFERENCES Tags (tag_id)
 );
