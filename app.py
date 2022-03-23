@@ -295,15 +295,6 @@ def upload_file():
 	else:
 		return render_template('upload.html')
 
-@app.route('/show_photo', methods=['GET', 'POST'])
-@flask_login.login_required
-def show_photo():
-	uid = getUserIdFromEmail(flask_login.current_user.id)
-	aid = getAlbumIdFromUsers(uid)
-	cursor = conn.cursor()
-	cursor.execute("SELECT data, caption FROM Photos WHERE user_id = '{0}'".format(aid))
-	return render_template('show_photo.html', name = getAlbumNameFromAlbums(uid), photos=getUsersPhotos(uid))
-
 @app.route("/delete_photo", methods=['GET', 'POST'])
 @flask_login.login_required
 def delete_photo():
@@ -615,7 +606,7 @@ def getAllPhotoIDFromTagID(tid):
 	cursor.execute("SELECT photo_id FROM Photos WHERE photo_id IN \
 						(SELECT photo_id FROM Tagged WHERE tag_id = '{0}')".format(tid) )
 	return cursor.fetchall()
-	
+
 def getPhotoFromPhotoID(pid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE photo_id = '{0}'".format(pid) )
