@@ -9,12 +9,6 @@
 # see links for further understanding
 ###################################################
 
-from cgi import test
-from dataclasses import dataclass
-from getpass import getuser
-import re
-from tkinter.tix import ListNoteBook
-from xml.etree.ElementTree import Comment
 import flask
 from flask import Flask, Response, flash, request, render_template, redirect, url_for
 from flaskext.mysql import MySQL
