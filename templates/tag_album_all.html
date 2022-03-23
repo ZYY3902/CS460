@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title></title>
+</head>
+    <body>
+        <div class="title">
+            <h1>{{Tag}} Photos</h1>
+        </div>
+        <div>
+            <p> See your photos with tag: <a href='/tag_album_user/{{Tag}}'>{{Tag}}</a>?</p>
+            
+            
+            {% if TagPhotos %}
+            <h2>Here are your photos</h2>
+                {% for photo in TagPhotos %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <a href='/delete_photo'>Delete Photo</a> | 
+                    <a href='/add_tag'>Add Tag</a>
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+
+            {% if TagPhotos is none %}
+            <div>
+                <h2>Photos are missing !!</h2>
+            </div>
+            {% endif %}
+        </div>
+
+        <br>
+        <p><a href='/popular_tags'>See Popular Tags</a></p>
+        <p> Go to <a href='/userprofile'>profile?</a></p>
+    </body>
+
+{% endblock %}

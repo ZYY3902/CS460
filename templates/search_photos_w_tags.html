@@ -1,0 +1,21 @@
+
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title></title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Search photos with Tags</h1>
+        </div>
+            <form method="post" enctype="multipart/form-data" action="/search_photos_with_tags">
+                <table>
+                    <label for="conjunctive_tags">Tags:</label>
+                    <input type="text" name="conjunctive_tags" required='true'/><br />
+                    <input type="submit" value=" Search !"/>
+                </table>
+            </form>
+    </body>
+
+{% endblock %}

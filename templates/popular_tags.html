@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title></title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Most Popular Tags Right Now!!</h1>
+        </div>
+        <div>
+            <!--<p> See all photos with tag: <a href='/tag_album_all/{{Tag}}'>{{Tag}}</a>?</p>-->
+            
+            
+            {% if Popular_Tags %}
+            <h2>Here's a list of Tags:</h2>
+                {% for tag in Popular_Tags %}
+                <li>
+                    <p>     <a href='/tag_album_all/{{tag}}'>{{tag}}</a></p>
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+
+                {% endfor %}
+
+            {% endif %}
+
+
+
+            {% if TagPhotos is none %}
+            <div>
+                <h2>Tags are missing (>_>)</h2>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <p> Go to <a href='/userprofile'>profile?</a></p>
+    </body>
+
+{% endblock %}

@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block content %}
+
+<head>
+    <title></title>
+</head>
+    <body>
+        <div class="title">
+            <h1>Here are your photo recommendations!!</h1>
+        </div>
+        <div>
+            {% if Photos1 %}
+                {% for photo in Photos1 %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if Photos2 %}
+                {% for photo in Photos2 %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if Photos3 %}
+                {% for photo in Photos3 %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if Photos4 %}
+                {% for photo in Photos4 %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+                {% endfor %}
+            {% endif %}
+
+            {% if Photos5 %}
+                {% for photo in Photos5 %}
+                <li>
+                    {{photo[2]}}<br>
+                    <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
+                    <!--a href="{{photo}}"></a> -->
+                </li>
+                {% endfor %}
+            {% endif %}
+
+
+
+            {% if Photos1 is none %}
+            <div>
+                <h2>Sorry, we don't have any recommendations for you !!</h2>
+            </div>
+            {% endif %}
+        </div>
+
+
+        <p> Go to <a href='/userprofile'>profile?</a></p>
+    </body>
+
+{% endblock %}

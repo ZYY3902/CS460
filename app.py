@@ -162,13 +162,19 @@ def protected():
 	return render_template('hello.html', message="Here's your profile", name = email, albums = getUsersAlbums(uid),
 							photos = getUsersPhotos(uid), base64 = base64,
 							friends = getUserFriends(uid), friends_recommendation = friends_recommendation(),
-							tags = getTagsNameUsedByUser(uid), userActivitys = userActivity())
+							userActivitys = userActivity(), tags = getTagNameFromUID(uid), 
+							pid_of_added_tag = None)
 
-# Functions in the template
+# Functions to get user data
 def getUsersPhotos(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE user_id = '{0}'".format(uid))
 	return cursor.fetchall() #NOTE list of tuples, [(imgdata, pid), ...]
+
+def getUsersName(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT fname, lname FROM Users WHERE user_id = '{0}'".format(uid))
+	return cursor.fetchall()
 
 def getUserIdFromEmail(email):
 	cursor = conn.cursor()
@@ -183,7 +189,6 @@ def isEmailUnique(email):
 		return False
 	else:
 		return True
-# End of the template functions
 
 def getUserFriends(uid):
 	cursor = conn.cursor()
@@ -290,14 +295,14 @@ def upload_file():
 	else:
 		return render_template('upload.html')
 
-@app.route('/show_photo/<tag_name>', methods=['GET', 'POST'])
+@app.route('/show_photo', methods=['GET', 'POST'])
 @flask_login.login_required
-def show_photo(tag_name):
+def show_photo():
 	uid = getUserIdFromEmail(flask_login.current_user.id)
-	tid = getTagIdFromTagName(tag_name)
+	aid = getAlbumIdFromUsers(uid)
 	cursor = conn.cursor()
-	cursor.execute("SELECT data, caption FROM Photos WHERE  = '{0}'".format(uid))
-	return 
+	cursor.execute("SELECT data, caption FROM Photos WHERE user_id = '{0}'".format(aid))
+	return render_template('show_photo.html', name = getAlbumNameFromAlbums(uid), photos=getUsersPhotos(uid))
 
 @app.route("/delete_photo", methods=['GET', 'POST'])
 @flask_login.login_required
@@ -340,12 +345,11 @@ def create_tag():
 	else:
   		return render_template('create_tag.html')
 
-@app.route("/add_tag", methods=['GET', 'POST'])
+@app.route("/add_tag2/<int:pid>", methods=['GET', 'POST'])
 @flask_login.login_required
-def add_tag():
+def add_tag2(pid):
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
-		pid = getPhotoIdFromPhotos(uid)
 		tag_name = request.form.get('tag_name')
 		tid = getTagIdFromTagName(tag_name)
 		if checkTagExist(tag_name):
@@ -353,53 +357,310 @@ def add_tag():
 			cursor.execute("INSERT INTO Tagged (photo_id, tag_id) VALUES(%s, %s)",(pid, tid))
 			conn.commit()
 			return render_template('hello.html', name=flask_login.current_user.id, 
-									message='Tag Added!')
+									message='Tag Added!')#, pid_of_added_tag= pid)
+		else:
+			return render_template("create_tag.html", message = "Tag not exist")
+	else:
+		return render_template('add_tag.html', base64 = base64, photo_id = pid)	
+
+@app.route("/add_tag", methods=['GET', 'POST'])
+@flask_login.login_required
+def add_tag():
+	if request.method == 'POST':
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+		pid = request.form.get('photo_id')
+		tag_name = request.form.get('tag_name')
+		tid = getTagIdFromTagName(tag_name)
+		if checkTagExist(tag_name):
+			cursor = conn.cursor()
+			cursor.execute("INSERT INTO Tagged (photo_id, tag_id) VALUES(%s, %s)",(pid, tid))
+			conn.commit()
+			return render_template('hello.html', name=flask_login.current_user.id, 
+									message='Tag Added!')#, pid_of_added_tag= pid)
 		else:
 			return render_template("create_tag.html", message = "Tag not exist")
 	else:
 		return render_template('add_tag.html')	
 
-def getAlbumIdFromUsers(uid):
-	cursor = conn.cursor()
-	cursor.execute("SELECT albums_id FROM Albums WHERE user_id = '{0}'".format(uid))
-	return cursor.fetchone()[0]
-	
-def getPhotoIdFromPhotos(uid):
-	cursor = conn.cursor()
-	cursor.execute("SELECT photo_id FROM Photos WHERE user_id = '{0}'".format(uid))
-	return cursor.fetchone()[0]
+@app.route("/show_photo_tags/<pid>", methods=['GET', 'POST'])
+def displayPhotoTags(pid):
+   if request.method == 'POST':
+       uid = getUserIdFromEmail(flask_login.current_user.id)
 
-def getTagIdFromTagName(tag_name):
+       cursor = conn.cursor()
+       cursor.execute('''SELECT word FROM Tags \
+                           WHERE tag_id IN (SELECT tag_id FROM Tagged \
+							   WHERE photo_id = (SELECT photo_id FROM Photos \
+								   WHERE photo_id = {0}))'''.format(pid))
+       conn.commit()
+       return render_template(template_name_or_list)                
+   else:
+       return render_template('tag_album_all.html')
+
+
+@app.route("/tag_album_all/<tag_name>", methods=['GET', 'POST'])
+def all_tag_album(tag_name):
+	if flask_login.current_user.id:
+		uid = getUserIdFromEmail(flask_login.current_user.id)
+	return render_template('tag_album_all.html', Name=flask_login.current_user.id, Tag=tag_name, 
+												TagPhotos= displayTagAlbumAll(tag_name), base64=base64)
+
+@app.route("/tag_album_user/<tag_name>")
+def user_tag_album(tag_name):
+		if flask_login.current_user.id:
+			uid = getUserIdFromEmail(flask_login.current_user.id)
+
+		return render_template('tag_album_user.html', Name=flask_login.current_user.id, Tag=tag_name, 
+													TagPhotos= displayTagAlbumUser(uid, tag_name), base64=base64)	
+
+def displayTagAlbumUser(uid, tag_name):
+	tid = getTagIdFromTagName(tag_name)[0][0]
+	#print(tid)
 	cursor = conn.cursor()
-	cursor.execute("SELECT tag_id FROM Tags WHERE word = '{0}'".format(tag_name))
+	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE (user_id = '{1}' AND photo_id IN \
+	   (SELECT photo_id FROM Tagged WHERE tag_id = '{0}') )".format(tid, uid))
+	conn.commit()
 	return cursor.fetchall()
+
+def displayTagAlbumAll(tag_name):
+	tid = getTagIdFromTagName(tag_name)[0][0]
+	#print(tid)
+	cursor = conn.cursor()
+	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE (photo_id IN \
+	   (SELECT photo_id FROM Tagged WHERE tag_id = '{0}') )".format(tid))
+	conn.commit()
+	return cursor.fetchall()
+
+	########################
+
+@app.route("/popular_tags", methods= ['GET', 'POST'])
+def find_popular_tags():
+	#uid = getUserIdFromEmail(flask_login.current_user.id)
+	popular_tags = find_popular_t()
+	tags = []
+	for tag in popular_tags:
+		tag = de_tuple(tag[0])
+		tags.append(tag)
+
+	return render_template('popular_tags.html', Popular_Tags= tags)
+
+def find_popular_tid():
+	cursor = conn.cursor()
+	cursor.execute("SELECT tag_id FROM \
+							(SELECT tag_id, COUNT(photo_id) FROM Tagged \
+								GROUP BY tag_id \
+									ORDER BY COUNT(photo_id) DESC \
+										LIMIT 3 ) AS S")
+	return cursor.fetchall()
+
+def find_popular_t():
+	popular_tag_ids = find_popular_tid()
+	tags = []
+	for id in popular_tag_ids:
+		tags.append(
+			getTagNameFromTageID(
+				de_tuple(id)
+			)
+		)
+
+	return tags
+
+	########################
+
+@app.route("/search_photos_with_tags", methods= ['GET', 'POST'])
+def photo_search_w_tag():
+	if request.method == 'POST':
+		conjunctive_tags = request.form.get('conjunctive_tags')
+
+		tags = breakIntoTagList(conjunctive_tags)
+
+		first_tag = tags[0]
+		rest_tag = tags[1:]
+		#print(first_tag)
+		#print(rest_tag)
+
+		rawList = getAllPhotoIDFromTagName(first_tag)
+		#print(rawList)
+		AllList = []
+		tempList = []
+		for id in rawList:
+			AllList.append(id[0])
+		#print('first tag list of pid')
+		#print(AllList)
+		if len(rest_tag) != 0:
+			for tag in rest_tag:
+				restrawList = getAllPhotoIDFromTagName(first_tag)
+				for rest_id in restrawList:
+					tempList.append(rest_id[0])
+				for n in tempList:
+					if n not in AllList:
+						tempList.remove(n)
+				AllList = tempList
+				#print('rest tag list of pid updates')
+				#print(AllList)
+
+		AllPhoto = []
+		for i in AllList:
+			AllPhoto.append(getPhotoFromPhotoID(i)[0])
+			
+		#print('now test if actual data is selected:')
+		#print(AllPhoto)
+		
+		return render_template('show_photos_w_tags.html', Tags= conjunctive_tags, Photos= AllPhoto, base64= base64)
+	else:
+		return render_template('search_photos_w_tags.html')
+
+
+def breakIntoTagList(tag_string):
+	List = tag_string.split()
+	return List
+
+################################
+
+@app.route("/getRecByTags", methods= ['GET', 'POST'])
+@flask_login.login_required
+def rec_by_most_used_tag():
+	uid = getUserIdFromEmail(flask_login.current_user.id)
+	popular_tags = get5PopularTag(uid)
+	print(popular_tags)
+
+	PhotosTag1 = []; tag1 = popular_tags[0]
+	PhotosTag2 = []; tag2 = popular_tags[1]
+	PhotosTag3 = []; tag3 = popular_tags[2]
+	PhotosTag4 = []; tag4 = popular_tags[3]
+	PhotosTag5 = []; tag5 = popular_tags[4]
+
+	if checkTagExist(tag1):
+		photoid1 = getAllPhotoIDFromTagName(tag1)
+		#PhotosTag1 = [getPhotoFromPhotoID(de_tuple(id) for item in photoid1
+
+
+	return render_template('get_rec_by_tags.html', Photos1= PhotosTag1, Photos2= PhotosTag2, Photos3= PhotosTag3, 
+											Photos4= PhotosTag4, Photos5= PhotosTag5, base64= base64)
+
+
+
+
+def checkTagNotNull(tag_name):
+	return (tag_name != "-1")
+
+def get5PopularTagIDUser(uid):
+	cursor = conn.cursor()
+	cursor.execute("(SELECT DISTINCT tag_id FROM Tagged INNER JOIN \
+						Photos WHERE user_id = '{0}' \
+							GROUP BY tag_id \
+								ORDER BY COUNT(Photos.photo_id) DESC \
+									LIMIT 5) ".format(uid) )
+	return cursor.fetchall()
+
+def get5PopularTag(uid):
+	Id_list = get5PopularTagIDUser(uid)
+	Ids = []
+	for i in Id_list:
+		id = de_tuple(getTagNameFromTageID(i))
+		Ids.append(id)
+
+	if len(Ids) < 5:
+		for num in range(1,(5-len(Ids)+1)):
+			Ids.append("-1")
+
+	print(Ids)
+
+	return Ids
+
+
+
+
+
+#############################
+def de_tuple(tup):
+	return tup[0]
 
 def getUsersAlbums(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT aname FROM Albums WHERE user_id = '{0}'".format(uid))
 	return cursor.fetchall()
 
-def getPhotoTagsFromUID(uid):
+def getAlbumIdFromUsers(uid):
 	cursor = conn.cursor()
-	cursor.execute("SELECT word FROM Tags WHERE tag_id = (SELECT tag_id \
-														  FROM Tagged \
-														  WHERE photo_id = \
-														  (SELECT photo_id FROM Photos \
-														   WHERE user_id ='{0}'))".format(uid))
-	return cursor.fetchall()
+	cursor.execute("SELECT albums_id FROM Albums WHERE user_id = '{0}'".format(uid))
+	return cursor.fetchone()[0]
 
-def getTagsNameUsedByUser(uid):
-	cursor = conn.cursor()
-	cursor.execute("SELECT word FROM Tags WHERE tag_id IN \
-					(SELECT tag_id FROM Tagged WHERE photo_id IN \
-					(SELECT photo_id FROM Photos WHERE user_id = '{0}'))".format(uid))
-	return cursor.fetchall()
-
-# function not in use #
 def getAlbumNameFromAlbums(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT aname FROM Albums WHERE user_id = '{0}'".format(uid))
 	return cursor.fetchone()[0]
+
+def getPhotoIdFromPhotos(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT photo_id FROM Photos WHERE user_id = '{0}'".format(uid))
+	return cursor.fetchone()[0]
+
+def getAllPhotoIDFromUID(uid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT photo_id FROM Photos WHERE user_id = '{0}' ".format(uid) )
+	return cursor.fetchall()
+
+def getAllPhotoIDFromTagName(tag_name):
+	tid = getTagIdFromTagName(tag_name)[0][0]
+	print(tid)
+	allphoto = getAllPhotoIDFromTagID(tid)
+	print('the length of the list of pid with same tid:')
+	print(len(allphoto))
+	return allphoto
+
+def getAllPhotoIDFromTagID(tid):
+	print(tid)
+	cursor = conn.cursor()
+	cursor.execute("SELECT photo_id FROM Photos WHERE photo_id IN \
+						(SELECT photo_id FROM Tagged WHERE tag_id = '{0}')".format(tid) )
+	return cursor.fetchall()
+	
+def getPhotoFromPhotoID(pid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT data, photo_id, caption FROM Photos WHERE photo_id = '{0}'".format(pid) )
+	return cursor.fetchall()
+
+
+
+def getTagIdFromTagName(tag_name):
+	cursor = conn.cursor()
+	cursor.execute("SELECT tag_id FROM Tags WHERE word = '{0}'".format(tag_name))
+	return cursor.fetchall()#[0][0]
+
+def getTagNameFromPhotoID(pid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT word FROM Tags WHERE tag_id IN (SELECT tag_id FROM Tagged WHERE photo_id ='{0}')".format(pid) )
+	return cursor.fetchall()
+
+def getTagIDFromPhotoID(pid):
+	cursor = conn.cursor()
+	cursor.execute("SELECT tag_id FROM Tagged WHERE photo_id = '{0}'".format(str(pid)))
+	return cursor.fetchall()
+
+def getTagNameFromUID(uid): # the version using for-loop is extremely inefficient !!!
+	Pids = getAllPhotoIDFromUID(uid)
+
+	AllTags = []
+	#Pids.remove((None,""))
+	for pid in Pids:
+		#print (pid)
+		tid = getTagNameFromPhotoID(de_tuple(pid))
+		#print (tid)
+		for tag_tuple in tid:
+			tag = de_tuple(tag_tuple)
+			if (tag not in AllTags):
+				AllTags.append(tag)
+
+	#print(AllTags)
+
+	return AllTags
+
+def getTagNameFromTageID(tag):
+	cursor = conn.cursor()
+	cursor.execute("SELECT word FROM Tags WHERE tag_id = '{0}'".format(tag))
+	return cursor.fetchall()
+
 
 def isOwnPhoto(pid, uid):
 	cursor = conn.cursor()
@@ -429,27 +690,43 @@ def getLikes():
 		cursor.execute("SELECT photo_id, COUNT(user_id) FROM Likes WHERE photo_id = '{0}'".format(p))
 		like = cursor.fetchone()
 		likes.append(like)
-	num = [(i[0], i[1]) for i in likes]
-	return num
+	num_likes = [(i[0], i[1]) for i in likes]
+	return num_likes
+
+def getLikesUsers():
+	cursor = conn.cursor()
+	cursor.execute("SELECT Likes.photo_id, Users.fname, Users.lname \
+						FROM Likes INNER JOIN Users on Likes.user_id = Users.user_id \
+						ORDER BY Likes.photo_id ASC")
+	users = cursor.fetchall()
+	names_users = [(i[0], i[1], i[2]) for i in users]
+	return names_users
 
 def getComments():
-	likes = []
+	comments = []
 	cursor = conn.cursor()
 	cursor.execute("SELECT photo_id FROM Photos \
 					ORDER BY photo_id ASC")
 	data = cursor.fetchall()
 	pid = [i[0] for i in data]
 	for p in pid:
-		cursor.execute("SELECT photo_id, text FROM Comments WHERE photo_id = '{0}'".format(p))
-		like = cursor.fetchone()
-		likes.append(like)
-	comment = [i for i in likes]
-	return comment
+		cursor.execute("SELECT text FROM Comments WHERE photo_id = '{0}'".format(p))
+		comment = cursor.fetchone()
+		comments.append(comment)
+	com = [i for i in comments]
+	return com
 
 @app.route("/public", methods=['GET'])
 def public():
+	cursor = conn.cursor()
+	cursor.execute("SELECT Albums.aname, Users.fname, Users.lname FROM Albums, Users \
+					WHERE Albums.user_id = Users.user_id\
+					ORDER BY Users.user_id ASC")
+	data = cursor.fetchall()
+	albums = [(i[0], i[1], i[2]) for i in data]
 	return render_template('public.html', message='Welecome to Photoshare',
-			photos=publicPhotosInfoFromPhotos(), base64=base64, likes=getLikes(), comments=getComments())
+			photos=publicPhotosInfoFromPhotos(), base64=base64, likes=getLikes(), comments=getComments(),
+			albums=albums, users=getLikesUsers())
 
 @app.route("/add_comment", methods=['POST'])
 def add_comment():
@@ -465,14 +742,13 @@ def add_comment():
 			conn.commit()
 			return render_template("public.html", 
 									message = "Comment Added!",
-									photos = publicPhotos(), base64=base64)
+									photos=publicPhotosInfoFromPhotos(), base64=base64)
 		else:
 			return render_template("public.html", 
 									message = "You cannot comment on your own photo! Please choose another photo!",
-									photos = publicPhotos(), base64=base64)
+									photos=publicPhotosInfoFromPhotos(), base64=base64)
 
 @app.route("/add_like", methods=['POST'])
-@flask_login.login_required
 def add_like():
 	if request.method == 'POST':
 		uid = getUserIdFromEmail(flask_login.current_user.id)
@@ -483,7 +759,7 @@ def add_like():
 		conn.commit()
 		return render_template("public.html", 
 									message = "Like Added!",
-									photos = publicPhotos(), base64=base64)
+									photos=publicPhotosInfoFromPhotos(), base64=base64)
 
 def getUsersNameFromUID(uid):
 	cursor = conn.cursor()
@@ -495,6 +771,7 @@ def getUsersNameFromUID(uid):
 @app.route("/search_comment", methods=['GET', 'POST'])
 @flask_login.login_required
 def search_comment():
+	names = []
 	if request.method == 'POST':
 		text = request.form.get('text')
 		cursor.execute("SELECT user_id, COUNT(*) AS counter FROM Comments\
@@ -504,7 +781,8 @@ def search_comment():
 		data = cursor.fetchall() #(user_id, counter), (2,1)
 		for i in data:
 			name = getUsersNameFromUID(i[0])
-		return render_template("search_comment.html", names = name)
+			names.append(name)
+		return render_template("search_comment.html", names = names)
 	else:
 		return render_template("search_comment.html")
 

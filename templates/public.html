@@ -8,56 +8,107 @@
   <h2>{{message}}!</h2>
 {% endif %}
 
-{% if tests %}
-<h2>{{tests}}</h2>
-{% endif %}
 
-
-<ul>
-    {% for photo in photos %} 
-        <li>
-            {{photo[1]}} | {{photo[2]}} |
-            <a href='/add_comment'>Add Comments</a> |
-            <a href='/add_like'>Give a Like</a><br>
-          <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 30%;">
-        </li>
-    {% endfor %}
-    {% for like in likes %} 
-        <li>
-           Likes for {{like[0]}}: {{like[1]}}
-        </li>
-    {% endfor %}
-    {% for c in comments %} 
-        <li>
-        Comments for {{c[0]}}: {{c[1]}}
-        </li>
-{% endfor %}
-</ul>
-        <!-- 
+<table border=1 width=98% style="margin-left:12px;">
+    <colgroup>
+        <col span="1" style="width: 50%;">
+        <col span="1" style="width: 50%;">
+    </colgroup>
+    <tr>
+        <th>Leave A Comment</th> <!-- empty -->
+        <th>Give A Like</th>
+    </tr>
+    <tr>
+        <td><form method="post" enctype="multipart/form-data" action="/add_comment">
+            <table>
+                <input type="text" name="text" placeholder= "Enter Comments" required='true' /><br />
+                <label for="pid">Photo Id:</label>
+                <input type="text" name="pid" required='true' /><br />
+                <label for="comment_date">Comment Date:</label>
+                <input type="text" name="comment_date" required='true' /><br />
+                <input type="submit" value="Add Comment!" />
+            </table>
+            </form></td>
         <td>
-            {% for photo in photos %}
-            <img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 40%;">
-            {% endfor %}
-        </td>
-        <td>
-            <form method="post" enctype="multipart/form-data" action="/add_comment">
+            <form method="post" enctype="multipart/form-data" action="/add_like">
                 <table>
-                    <input type="text" name="text" placeholder= "Enter Comments" required='true' /><br />
-                    <label for="pid">Photo Id:</label>
+                    <label for="pid">Please Enter the Photo Id:</label>
                     <input type="text" name="pid" required='true' /><br />
-                    <label for="comment_date">Comment Date:</label>
-                    <input type="text" name="comment_date" required='true' /><br />
-                    <input type="submit" value="Add Comment!" />
+                    <input type="submit" value="Like!" />
                 </table>
-            </form>
+                </form>
         </td>
-        <td>
-        </td>  
-    </tr> -->
-        
-    
+    </tr>
+
 </table>
 
+<h2>Here are all the albums</h2>
+<table border=1 width=98% style="margin-left:12px;">
+    <colgroup>
+        <col span="1" style="width: 100%;">
+    </colgroup>
+    {% for album in albums %}
+    <tr>
+        <td>{{album}}</td>
+    </tr>
+    {% endfor %}
+</table>
+
+<h2>Here are all the photos</h2>
+<table border=1 width=98% style="margin-left:12px;">
+    <colgroup>
+        <col span="1" style="width: 10%;">
+    </colgroup>
+    <tr> 
+        <th>Photo id</td>
+        {% for photo in photos %}
+        <td>{{photo[1]}}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Caption</td>
+        {% for photo in photos %}
+        <td>{{photo[2]}}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th></td>
+        {% for photo in photos %}
+        <td><img src='data:image/jpg;base64, {{ base64.b64encode(photo[0]).decode("ascii") }}' style="width: 100%;"></td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Number of Likes</td>
+        {% for like in likes %}
+        <td>{{like[1]}}</td>
+        {% endfor %}
+    </tr>
+    <tr>
+        <th>Comment</td>
+        {% for c in comments %}
+        <td>{{c}}</td>
+        {% endfor %}
+    </tr>
+</table>
+
+<table border=1 width=98% style="margin-left:12px;">
+    <colgroup>
+        <col span="1" style="width: 10%;">
+    </colgroup>
+    <tr> 
+        <th>Photo id</td>
+        <th>Users Who like this photo?</th>
+    </tr>
+    {% for u in users %}
+    <tr>
+            
+            <td>{{u[0]}}</td>
+            
+            <td>{{u[1]}}, {{u[2]}}</td>
+            
+    </tr>
+    {% endfor %}
+</table>
 
 
 {% endblock %}

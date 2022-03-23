@@ -44,10 +44,14 @@
   <ul>
     {% for tag in tags %}
       <li>
-        <a href='/show_photo'>{{tag[0]}}</a>
+        <a href="/tag_album_user/{{tag}}">{{tag}}</a> 
+        <br>
       </li>
     {% endfor %}
   </ul>
+  <br>
+  <h3><a href='popular_tags'>See what's popular!</a></h3>
+  <h3><a href='getRecByTags'>Get Your Recommendations!</a></h3>
 {% endif %}
 
 {%if friends %}
