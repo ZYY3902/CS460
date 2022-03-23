@@ -201,7 +201,7 @@ def getUserFriends(uid):
 def getUserFriendsId(uid):
 	cursor = conn.cursor()
 	cursor.execute("SELECT user_id2 FROM Friends WHERE user_id1 ='{0}'".format(uid))
-	return cursor.fetchone()[0]
+	return cursor.fetchone()
 
 @app.route("/search_friend", methods=['GET', 'POST'])
 @flask_login.login_required
